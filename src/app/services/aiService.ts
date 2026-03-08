@@ -74,9 +74,9 @@ export async function generateAIResponse(
   const messagesWithContext = hasSystemMessage ? messages : [getSystemContext(), ...messages];
 
   try {
-    // Use backend API - full URL for Docker, proxy for dev
+    // Use backend API - Railway domain for production, proxy for dev
     const apiUrl = import.meta.env.PROD 
-      ? 'http://localhost:3001/api/chat'
+      ? window.location.origin + '/api/chat'
       : '/api/chat';
     
     const response = await fetch(apiUrl, {
