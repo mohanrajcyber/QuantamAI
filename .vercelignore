@@ -1,0 +1,17 @@
+# Exclude backend folder from Vercel deployment
+backend/
+
+# Exclude external libraries
+ollamafreeapi-main/
+sphere-main/
+zan/
+
+# Exclude docs (too large)
+docs/
+
+# Exclude test files
+**/*test*.js
+**/*test*.ts
+
+# Exclude API keys file
+API keys.txt
