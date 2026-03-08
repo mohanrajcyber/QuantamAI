@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test YouTube API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #ff0000;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            border-left: 4px solid #00ff00;
+        }
+        .error {
+            border-left: 4px solid #ff0000;
+        }
+        .info {
+            border-left: 4px solid #ffaa00;
+        }
+        .video-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .video-item {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            gap: 15px;
+        }
+        .video-item img {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .video-info {
+            flex: 1;
+        }
+        .video-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .video-channel {
+            color: #aaa;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 YouTube API Tester</h1>
+        
+        <div>
+            <label>Enter your YouTube API Key:</label>
+            <input type="text" id="apiKey" placeholder="AIzaSy..." value="AIzaSyAQAb5RNuJBCNedJs19gkaE-TUG3asD4Shj4UJsbLLAaoX-8c92g">
+        </div>
+
+        <div>
+            <label>Search Query:</label>
+            <input type="text" id="searchQuery" placeholder="lofi music" value="lofi music">
+        </div>
+
+        <div>
+            <button onclick="testAPIKey()">1. Test API Key</button>
+            <button onclick="testSearch()">2. Test Search</button>
+            <button onclick="testTrending()">3. Test Trending</button>
+        </div>
+
+        <div id="result"></div>
+        <div id="videos"></div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+
+        function showVideos(videos) {
+            const videosDiv = document.getElementById('videos');
+            if (!videos || videos.length === 0) {
+                videosDiv.innerHTML = '';
+                return;
+            }
+
+            videosDiv.innerHTML = '<h3>Videos Found:</h3>';
+            const videoList = document.createElement('div');
+            videoList.className = 'video-list';
+
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `
+                    <img src="${video.thumbnail}" alt="${video.title}">
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-channel">${video.channelTitle}</div>
+                    </div>
+                `;
+                videoList.appendChild(videoItem);
+            });
+
+            videosDiv.appendChild(videoList);
+        }
+
+        async function testAPIKey() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                showResult('❌ Please enter an API key', 'error');
+                return;
+            }
+
+            showResult('🔄 Testing API key...', 'info');
+
+            try {
+                // Test with a simple API call
+                const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=1&key=${apiKey}`;
+                
+                console.log('Testing URL:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                console.log('Response:', data);
+
+                if (response.ok && data.items) {
+                    showResult(`✅ API Key is VALID!\n\nAPI Key Format: ${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 5)}\nLength: ${apiKey.length} characters\n\nYou can now use this API key in your app!`, 'success');
+                } else if (data.error) {
+                    showResult(`❌ API Key Error:\n\nError: ${data.error.message}\nCode: ${data.error.code}\nStatus: ${data.error.status}\n\nPlease check:\n1. API key is correct\n2. YouTube Data API v3 is enabled\n3. API key restrictions (if any)`, 'error');
+                } else {
+                    showResult(`❌ Unexpected response:\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Network Error:\n\n${error.message}\n\nPlease check your internet connection.`, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        async function testSearch() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const query = document.getElementById('searchQuery').value.trim();
+
+            if (!apiKey) {
+                showResult('❌ Please enter an API key', 'error');
+                return;
+            }
+
+            if (!query) {
+                showResult('❌ Please enter a search query', 'error');
+                return;
+            }
+
+            showResult(`🔄 Searching for "${query}"...`, 'info');
+            showVideos([]);
+
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
+                
+                console.log('Search URL:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                console.log('Search Response:', data);
+
+                if (response.ok && data.items) {
+                    const videos = data.items.map(item => ({
+                        id: item.id.videoId,
+                        title: item.snippet.title,
+                        channelTitle: item.snippet.channelTitle,
+                        thumbnail: item.snippet.thumbnails.medium.url
+                    }));
+
+                    showResult(`✅ Search Successful!\n\nFound ${videos.length} videos for "${query}"\n\nAPI is working perfectly!`, 'success');
+                    showVideos(videos);
+                } else if (data.error) {
+                    showResult(`❌ Search Error:\n\nError: ${data.error.message}\nCode: ${data.error.code}\n\n${JSON.stringify(data.error, null, 2)}`, 'error');
+                } else {
+                    showResult(`❌ Unexpected response:\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Network Error:\n\n${error.message}`, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        async function testTrending() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            if (!apiKey) {
+                showResult('❌ Please enter an API key', 'error');
+                return;
+            }
+
+            showResult('🔄 Loading trending videos...', 'info');
+            showVideos([]);
+
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=5&key=${apiKey}`;
+                
+                console.log('Trending URL:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                console.log('Trending Response:', data);
+
+                if (response.ok && data.items) {
+                    const videos = data.items.map(item => ({
+                        id: item.id,
+                        title: item.snippet.title,
+                        channelTitle: item.snippet.channelTitle,
+                        thumbnail: item.snippet.thumbnails.medium.url
+                    }));
+
+                    showResult(`✅ Trending Videos Loaded!\n\nFound ${videos.length} trending videos\n\nAPI is working perfectly!`, 'success');
+                    showVideos(videos);
+                } else if (data.error) {
+                    showResult(`❌ Trending Error:\n\nError: ${data.error.message}\nCode: ${data.error.code}\n\n${JSON.stringify(data.error, null, 2)}`, 'error');
+                } else {
+                    showResult(`❌ Unexpected response:\n\n${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Network Error:\n\n${error.message}`, 'error');
+                console.error('Error:', error);
+            }
+        }
+
+        // Auto-test on load
+        window.onload = () => {
+            showResult('👋 Welcome to YouTube API Tester!\n\n1. First, click "Test API Key" to verify your key\n2. Then try "Test Search" to search videos\n3. Or "Test Trending" to see trending videos\n\nCheck browser console (F12) for detailed logs.', 'info');
+        };
+    </script>
+</body>
+</html>

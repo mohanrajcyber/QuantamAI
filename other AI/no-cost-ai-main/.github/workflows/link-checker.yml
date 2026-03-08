@@ -1,0 +1,327 @@
+name: Daily Link Checker
+
+on:
+  schedule:
+    # Run daily at 9:00 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual triggering
+  push:
+    paths:
+      - 'README.md'
+      - '.github/workflows/link-checker.yml'
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # To create issues for broken links
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: |
+        npm init -y
+        npm install axios cheerio markdown-link-extractor
+        
+    - name: Create link checker script
+      run: |
+        cat > check-links.js << 'EOF'
+        const fs = require('fs');
+        const axios = require('axios');
+        const markdownLinkExtractor = require('markdown-link-extractor');
+        
+        class LinkChecker {
+          constructor() {
+            this.brokenLinks = [];
+            this.successfulLinks = [];
+            this.timeoutLinks = [];
+            this.redirectLoopLinks = []; // For redirect issues
+            this.totalChecked = 0;
+            
+            // User agents to rotate through
+            this.userAgents = [
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15'
+            ];
+          }
+        
+          async checkLink(url, maxRetries = 2) {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+              try {
+                console.log(`Checking: ${url} (attempt ${attempt}/${maxRetries})`);
+                
+                // Rotate user agents for each attempt
+                const userAgent = this.userAgents[attempt % this.userAgents.length];
+                
+                const response = await axios.get(url, {
+                  timeout: 20000, // 20 seconds
+                  headers: {
+                    'User-Agent': userAgent,
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'Sec-Fetch-Dest': 'document',
+                    'Sec-Fetch-Mode': 'navigate',
+                    'Sec-Fetch-Site': 'none',
+                    'Sec-Fetch-User': '?1',
+                    'Upgrade-Insecure-Requests': '1'
+                  },
+                  maxRedirects: 10,
+                  validateStatus: function (status) {
+                    // Accept 2xx, 3xx, 4xx, and 5xx - basically any response means the link works
+                    return status >= 200 && status < 600;
+                  }
+                });
+                
+                this.successfulLinks.push({
+                  url: url,
+                  status: response.status,
+                  finalUrl: response.request.res.responseUrl || url,
+                  statusNote: response.status >= 400 ? 'Working (with restrictions/errors)' : 'Working normally'
+                });
+                
+                const statusEmoji = response.status >= 500 ? '🔧' : response.status >= 400 ? '🛡️' : '✅';
+                console.log(`${statusEmoji} ${url} - Status: ${response.status}`);
+                return true;
+                
+              } catch (error) {
+                const errorInfo = {
+                  url: url,
+                  error: error.message,
+                  code: error.code,
+                  status: error.response?.status || 'No response'
+                };
+                
+                if (attempt === maxRetries) {
+                  // Only categorize as broken if we can't reach the server at all
+                  if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+                    this.timeoutLinks.push(errorInfo);
+                    console.log(`⏱️ ${url} - Timeout (unreachable)`);
+                  } else if (error.message.includes('Maximum redirect') || error.message.includes('too many redirects')) {
+                    this.redirectLoopLinks.push(errorInfo);
+                    console.log(`🔄 ${url} - Redirect loop detected`);
+                  } else {
+                    // Network errors, DNS failures, connection refused, etc.
+                    this.brokenLinks.push(errorInfo);
+                    console.log(`✗ ${url} - Unreachable: ${error.message}`);
+                  }
+                  return false;
+                } else {
+                  console.log(`Retrying ${url} in 3 seconds...`);
+                  await new Promise(resolve => setTimeout(resolve, 3000));
+                }
+              }
+            }
+          }
+        
+          extractLinksFromMarkdown(content) {
+            const links = markdownLinkExtractor(content);
+            // Filter out internal links, mailto links, and duplicates
+            const filteredLinks = [...new Set(links.filter(link => 
+              link.startsWith('http://') || link.startsWith('https://')
+            ))];
+            return filteredLinks;
+          }
+        
+          async checkAllLinks() {
+            try {
+              // Read README.md
+              const readmeContent = fs.readFileSync('README.md', 'utf8');
+              const links = this.extractLinksFromMarkdown(readmeContent);
+              
+              console.log(`Found ${links.length} unique links to check`);
+              this.totalChecked = links.length;
+              
+              // Check links with some delay to avoid overwhelming servers
+              for (let i = 0; i < links.length; i++) {
+                await this.checkLink(links[i]);
+                
+                // Add delay between requests to be respectful
+                if (i < links.length - 1) {
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+              }
+              
+              this.generateReport();
+              
+            } catch (error) {
+              console.error('Error during link checking:', error);
+              process.exit(1);
+            }
+          }
+        
+          generateReport() {
+            const report = {
+              timestamp: new Date().toISOString(),
+              summary: {
+                totalChecked: this.totalChecked,
+                successful: this.successfulLinks.length,
+                broken: this.brokenLinks.length,
+                timeout: this.timeoutLinks.length,
+                redirectLoops: this.redirectLoopLinks.length
+              },
+              brokenLinks: this.brokenLinks,
+              timeoutLinks: this.timeoutLinks,
+              redirectLoopLinks: this.redirectLoopLinks,
+              successfulLinks: this.successfulLinks
+            };
+            
+            // Write detailed report to file
+            fs.writeFileSync('link-check-report.json', JSON.stringify(report, null, 2));
+            
+            // Generate summary for GitHub Actions
+            console.log('\n=== LINK CHECK SUMMARY ===');
+            console.log(`Total links checked: ${this.totalChecked}`);
+            console.log(`✅ Working (including 403/500): ${this.successfulLinks.length}`);
+            console.log(`❌ Unreachable/Broken: ${this.brokenLinks.length}`);
+            console.log(`⏱️ Timeout: ${this.timeoutLinks.length}`);
+            console.log(`🔄 Redirect loops: ${this.redirectLoopLinks.length}`);
+            
+            // Only treat truly unreachable links as critical issues
+            const criticalIssues = this.brokenLinks.length;
+            const warningIssues = this.timeoutLinks.length + this.redirectLoopLinks.length;
+            
+            if (this.brokenLinks.length > 0) {
+              console.log('\n=== UNREACHABLE LINKS (CRITICAL) ===');
+              this.brokenLinks.forEach(link => {
+                console.log(`❌ ${link.url} - ${link.error} (Status: ${link.status})`);
+              });
+            }
+            
+            if (this.timeoutLinks.length > 0) {
+              console.log('\n=== TIMEOUT LINKS (WARNING) ===');
+              this.timeoutLinks.forEach(link => {
+                console.log(`⏱️ ${link.url} - ${link.error} (Status: ${link.status})`);
+              });
+            }
+            
+            if (this.redirectLoopLinks.length > 0) {
+              console.log('\n=== REDIRECT LOOP LINKS (WARNING) ===');
+              this.redirectLoopLinks.forEach(link => {
+                console.log(`🔄 ${link.url} - ${link.error}`);
+              });
+            }
+            
+            // Set GitHub Actions outputs - only critical issues trigger issue creation
+            if (process.env.GITHUB_OUTPUT) {
+              const output = `broken_count=${this.brokenLinks.length}\nwarning_count=${warningIssues}\ntotal_critical=${criticalIssues}`;
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, output);
+            }
+          }
+        }
+        
+        // Run the link checker
+        const checker = new LinkChecker();
+        checker.checkAllLinks();
+        EOF
+        
+    - name: Run link checker
+      id: check-links
+      run: node check-links.js
+      
+    - name: Upload report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: link-check-report-${{ github.run_number }}
+        path: link-check-report.json
+        
+    - name: Create issue for broken links
+      if: steps.check-links.outputs.broken_count > 0
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('link-check-report.json', 'utf8'));
+          
+          let issueBody = `# 🔗 Link Check Report\n\n`;
+          issueBody += `**Report generated:** ${report.timestamp}\n\n`;
+          issueBody += `## Summary\n`;
+          issueBody += `- 📊 Total links checked: ${report.summary.totalChecked}\n`;
+          issueBody += `- ✅ Working (including 403/500): ${report.summary.successful}\n`;
+          issueBody += `- ❌ **Unreachable/Broken: ${report.summary.broken}**\n`;
+          issueBody += `- ⏱️ Timeout: ${report.summary.timeout}\n`;
+          issueBody += `- 🔄 Redirect loops: ${report.summary.redirectLoops}\n\n`;
+          
+          if (report.brokenLinks.length > 0) {
+            issueBody += `## 🚨 Critical: Unreachable Links\n\n`;
+            issueBody += `These links are completely unreachable and need attention:\n\n`;
+            report.brokenLinks.forEach(link => {
+              issueBody += `- ❌ [${link.url}](${link.url})\n`;
+              issueBody += `  - **Error:** ${link.error}\n`;
+              issueBody += `  - **Status:** ${link.status}\n\n`;
+            });
+          }
+          
+          if (report.timeoutLinks.length > 0) {
+            issueBody += `## ⚠️ Warning: Timeout Issues\n\n`;
+            issueBody += `These links timed out (might be temporary):\n\n`;
+            report.timeoutLinks.forEach(link => {
+              issueBody += `- ⏱️ [${link.url}](${link.url})\n`;
+              issueBody += `  - **Issue:** ${link.error}\n`;
+              issueBody += `  - **Status:** ${link.status}\n\n`;
+            });
+          }
+          
+          if (report.redirectLoopLinks.length > 0) {
+            issueBody += `## 🔄 Warning: Redirect Loops\n\n`;
+            issueBody += `These links have redirect issues:\n\n`;
+            report.redirectLoopLinks.forEach(link => {
+              issueBody += `- 🔄 [${link.url}](${link.url})\n`;
+              issueBody += `  - **Issue:** ${link.error}\n\n`;
+            });
+          }
+          
+          issueBody += `\n---\n*This issue was automatically generated by the daily link checker workflow.*`;
+          
+          // Check if there's already an open issue for broken links
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'broken-links'
+          });
+          
+          const existingIssue = issues.data.find(issue => 
+            issue.title.includes('Broken Links Detected')
+          );
+          
+          if (existingIssue) {
+            // Update existing issue
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              body: `## Updated Link Check Report\n\n${issueBody}`
+            });
+            console.log(`Updated existing issue #${existingIssue.number}`);
+          } else {
+            // Create new issue
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🚨 Broken Links Detected - ${new Date().toISOString().split('T')[0]}`,
+              body: issueBody,
+              labels: ['broken-links', 'automated']
+            });
+            console.log(`Created new issue #${issue.data.number}`);
+          }
+          
+    - name: Comment on success
+      if: steps.check-links.outputs.broken_count == 0
+      run: |
+        echo "🎉 No unreachable links found!"
+        echo "✅ All links are working (including those with 403/500 status codes)"
+        echo "⚠️ Warnings: ${{ steps.check-links.outputs.warning_count }} (timeouts/redirects - might be temporary)"
+        echo "📊 Full report available in artifacts."

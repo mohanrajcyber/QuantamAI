@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum AI - All Links</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .status {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .links-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .link-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            color: white;
+            text-decoration: none;
+            display: block;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .link-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .link-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .link-url {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .commands {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .command-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .command-item code {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+        }
+
+        .creator-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Quantum AI</h1>
+            <p>All Links & Commands in One Place</p>
+        </div>
+
+        <div class="status">
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <strong>Backend</strong>
+                <div>Port 3001</div>
+            </div>
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <strong>Frontend</strong>
+                <div>Port 5173</div>
+            </div>
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <strong>Status</strong>
+                <div>Running</div>
+            </div>
+        </div>
+
+        <div class="links-section">
+            <h2 class="section-title">🔗 Main Links</h2>
+            
+            <a href="http://localhost:5173?logout=force" target="_blank" class="link-card">
+                <h3>🔓 Login Page (Force Logout)</h3>
+                <p>Use this to see the login/signup page. Perfect for testing!</p>
+                <div class="link-url">http://localhost:5173?logout=force</div>
+            </a>
+
+            <a href="http://localhost:5173" target="_blank" class="link-card">
+                <h3>🏠 Main App (Normal Access)</h3>
+                <p>Main Quantum AI interface. Auto-login if you're already logged in.</p>
+                <div class="link-url">http://localhost:5173</div>
+            </a>
+
+            <a href="http://localhost:3001" target="_blank" class="link-card">
+                <h3>⚙️ Backend API</h3>
+                <p>Backend server with all APIs and services.</p>
+                <div class="link-url">http://localhost:3001</div>
+            </a>
+        </div>
+
+        <div class="commands">
+            <h2 class="section-title">⚡ Special Commands</h2>
+            
+            <div class="command-item">
+                <strong>Master Control Access:</strong><br>
+                Type in chat: <code>/source code 17120105MOHANRAJ</code>
+            </div>
+
+            <div class="command-item">
+                <strong>Quantum Shutdown:</strong><br>
+                Type in chat: <code>quantum shutdown</code>
+            </div>
+
+            <div class="command-item">
+                <strong>Quantum Restart:</strong><br>
+                Type in chat: <code>quantum restart</code>
+            </div>
+
+            <div class="command-item">
+                <strong>Quantum Lockdown:</strong><br>
+                Type in chat: <code>quantum lockdown</code>
+            </div>
+
+            <div class="command-item">
+                <strong>Quantum Unlock:</strong><br>
+                Type in chat: <code>quantum unlock</code>
+            </div>
+
+            <div class="command-item">
+                <strong>Memory Purge:</strong><br>
+                Type in chat: <code>quantum memory purge</code>
+            </div>
+        </div>
+
+        <div class="creator-info">
+            <strong>Created by Mohanraj</strong><br>
+            Cybersecurity Researcher & AI Developer<br>
+            📧 mohanraj.cyber@gmail.com | 📱 +916383418971
+        </div>
+
+        <div class="footer">
+            <p>Quantum AI v1.0.0 | All Systems Operational ✅</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                Bookmark this page for quick access to all links!
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh status every 5 seconds
+        setInterval(() => {
+            const dots = document.querySelectorAll('.status-dot');
+            dots.forEach(dot => {
+                dot.style.animation = 'none';
+                setTimeout(() => {
+                    dot.style.animation = 'pulse 2s infinite';
+                }, 10);
+            });
+        }, 5000);
+
+        // Show notification on page load
+        window.addEventListener('load', () => {
+            console.log('🚀 Quantum AI - All Links Page Loaded');
+            console.log('📍 Login Page: http://localhost:5173?logout=force');
+            console.log('📍 Main App: http://localhost:5173');
+            console.log('📍 Backend: http://localhost:3001');
+        });
+    </script>
+</body>
+</html>

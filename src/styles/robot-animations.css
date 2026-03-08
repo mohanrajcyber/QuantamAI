@@ -1,0 +1,171 @@
+/* State-driven Robot Animations for Quantum AI */
+
+/* 1. IDLE - Slow breathing / subtle floating */
+@keyframes breathe {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* 2. BLINK - Occasional eye blink */
+@keyframes blink {
+  0%, 90%, 100% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 5s ease-in-out infinite;
+}
+
+/* 3. USER TYPING - Attentive (slight tilt) */
+@keyframes attentive {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-1px);
+  }
+}
+
+.animate-attentive {
+  animation: attentive 2s ease-in-out infinite;
+}
+
+/* 4. THINKING - Head tilt + processing */
+@keyframes processing {
+  0%, 100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-2px);
+  }
+}
+
+.animate-processing {
+  animation: processing 1.5s ease-in-out infinite;
+}
+
+/* 5. SUCCESS - Bounce once (one-time animation) */
+@keyframes success {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-8px) scale(1.1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05);
+  }
+  70% {
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-success {
+  animation: success 0.6s ease-out;
+}
+
+/* 6. CONFUSED - Gentle side-to-side shake */
+@keyframes shake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+.animate-shake {
+  animation: shake 2s ease-in-out infinite;
+}
+
+/* 7. ERROR - Glitch effect */
+@keyframes glitch {
+  0%, 100% {
+    transform: translate(0, 0);
+    filter: hue-rotate(0deg);
+  }
+  10% {
+    transform: translate(-2px, 1px);
+    filter: hue-rotate(90deg);
+  }
+  20% {
+    transform: translate(2px, -1px);
+    filter: hue-rotate(180deg);
+  }
+  30% {
+    transform: translate(-1px, 2px);
+    filter: hue-rotate(270deg);
+  }
+  40% {
+    transform: translate(1px, -2px);
+    filter: hue-rotate(360deg);
+  }
+  50% {
+    transform: translate(0, 0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+.animate-glitch {
+  animation: glitch 0.5s ease-in-out 2;
+}
+
+/* Smooth transitions between states */
+.robot-avatar {
+  transition: all 0.3s ease-in-out;
+}
+
+
+/* 8. ARM WAVE - Left arm wave for greeting/confident */
+@keyframes wave-left {
+  0%, 100% {
+    transform: rotate(0deg);
+    transform-origin: top center;
+  }
+  25% {
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(-20deg);
+  }
+}
+
+.animate-wave-left {
+  animation: wave-left 1s ease-in-out 2;
+}
+
+/* 9. ARM WAVE - Right arm wave for user typing */
+@keyframes wave-right {
+  0%, 100% {
+    transform: rotate(0deg);
+    transform-origin: top center;
+  }
+  50% {
+    transform: rotate(15deg);
+  }
+}
+
+.animate-wave-right {
+  animation: wave-right 0.5s ease-in-out infinite;
+}
