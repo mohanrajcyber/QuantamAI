@@ -24,7 +24,7 @@
 
 ## 🎥 Live Demo
 
-**🌐 Try it now:** [https://quantumai.vercel.app](https://quantumai.vercel.app)
+**🌐 Try it now:** [https://quantumai.vercel.app](https://quantam-ai.vercel.app/)
 
 **Demo Credentials:**
 - Click "Skip Login" for instant access
