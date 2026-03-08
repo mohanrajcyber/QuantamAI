@@ -24,7 +24,7 @@
 
 ## 🎥 Live Demo
 
-**🌐 Try it now:** [https://quantumai.vercel.app](https://quantam-ai.vercel.app/)
+**🌐 Try it now:** [https://quantam-ai.vercel.app](https://quantam-ai.vercel.app)
 
 **Demo Credentials:**
 - Click "Skip Login" for instant access
@@ -142,7 +142,7 @@ QuantumAI/
 ## 🚀 Quick Start
 
 ### 🌐 Try Live Demo (Fastest!)
-**Just visit:** [https://quantumai.vercel.app](https://quantumai.vercel.app)
+**Just visit:** [https://quantam-ai.vercel.app](https://quantam-ai.vercel.app)
 - No installation needed
 - Works instantly
 - All features available
@@ -459,7 +459,7 @@ A comprehensive AI platform that breaks language and technology barriers:
 ## 📸 Screenshots
 
 ### 🎨 Live Application
-**🌐 Live Demo:** [https://quantumai.vercel.app](https://quantumai.vercel.app)
+**🌐 Live Demo:** [https://quantam-ai.vercel.app](https://quantam-ai.vercel.app)
 
 ### Application Screenshots
 
@@ -518,7 +518,7 @@ AI for Bharat Hackathon 2026 Participant
 - 📧 Email: mohanraj.cyber@gmail.com
 - 📱 Phone: +91 6383418971
 - 🔗 GitHub: [@mohanrajcyber](https://github.com/mohanrajcyber)
-- 🌐 Live Demo: [quantumai.vercel.app](https://quantumai.vercel.app)
+- 🌐 Live Demo: [quantam-ai.vercel.app](https://quantam-ai.vercel.app)
 
 ### About the Project
 Quantum AI was built for the AI for Bharat Hackathon 2026 with a mission to make AI accessible to every Indian, regardless of language or device. The project demonstrates how modern web technologies can create inclusive, powerful AI tools that work for everyone.
@@ -592,7 +592,7 @@ For issues or questions:
 
 If you find Quantum AI useful for the hackathon or your projects, please give it a ⭐ on GitHub!
 
-**Live Demo:** [https://quantumai.vercel.app](https://quantumai.vercel.app)
+**Live Demo:** [https://quantam-ai.vercel.app](https://quantam-ai.vercel.app)
 
 ---
 
