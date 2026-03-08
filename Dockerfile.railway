@@ -1,0 +1,33 @@
+# Quantum AI - Railway Optimized Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install serve globally
+RUN npm install -g serve
+
+# Copy package files
+COPY package*.json ./
+COPY backend/package*.json ./backend/
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+RUN cd backend && npm install --production
+
+# Copy source code
+COPY . .
+
+# Build frontend
+RUN npm run build
+
+# Expose ports
+EXPOSE 3000 3001
+
+# Create startup script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'cd /app/backend && node server.js &' >> /app/start.sh && \
+    echo 'cd /app && serve -s dist -l 3000' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
+# Start both services
+CMD ["/bin/sh", "/app/start.sh"]
