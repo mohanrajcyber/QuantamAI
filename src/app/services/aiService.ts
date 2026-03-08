@@ -193,3 +193,12 @@ export async function getAvailableModels(): Promise<any> {
     huggingface: ['microsoft/DialoGPT-large']
   };
 }
+
+// Get Ollama status (stub for compatibility)
+export async function getOllamaStatus(): Promise<any> {
+  return {
+    status: 'not_available',
+    message: 'Ollama is not available in serverless deployment. Using cloud AI providers instead.',
+    providers: ['OpenAI', 'Groq', 'Gemini', 'Hugging Face']
+  };
+}
