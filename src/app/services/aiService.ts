@@ -62,58 +62,57 @@ function callMockAI(messages: Message[]): string {
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
-// Main AI Service - Direct API calls with CORS proxy for GitHub Pages
+// Main AI Service - Uses backend API
 export async function generateAIResponse(
   messages: Message[],
   provider: AIProvider = 'groq',
-  model?: string
+  model?: string,
+  conversationId?: string
 ): Promise<string> {
   // Add system context
   const hasSystemMessage = messages.some(m => m.role === 'system');
   const messagesWithContext = hasSystemMessage ? messages : [getSystemContext(), ...messages];
 
   try {
-    // Try Groq first (fastest and most reliable)
-    try {
-      const response = await callGroqDirect(messagesWithContext, model);
-      console.log('✅ Response from Groq');
-      return response;
-    } catch (error) {
-      console.warn('Groq failed, trying fallback...');
+    // Use backend API - full URL for Docker, proxy for dev
+    const apiUrl = import.meta.env.PROD 
+      ? 'http://localhost:3001/api/chat'
+      : '/api/chat';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: messagesWithContext,
+        conversationId: conversationId || `conv_${Date.now()}`,
+        useCache: true
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.statusText}`);
     }
 
-    // Fallback to mock AI
-    return callMockAI(messagesWithContext);
+    const data = await response.json();
+    console.log(`✅ Response from ${data.provider || 'backend'}`);
+    
+    // Handle different response formats
+    if (data.response) {
+      return data.response;
+    } else if (data.choices && data.choices[0]?.message?.content) {
+      return data.choices[0].message.content;
+    } else if (typeof data === 'string') {
+      return data;
+    }
+    
+    throw new Error('Invalid response format from backend');
   } catch (error) {
     console.error('API Error:', error);
+    // Fallback to mock AI
     return callMockAI(messagesWithContext);
   }
-}
-
-// Direct Groq API call (works on GitHub Pages)
-async function callGroqDirect(messages: Message[], model = 'mixtral-8x7b-32768'): Promise<string> {
-  const GROQ_API_KEY = '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';
-  
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${GROQ_API_KEY}`
-    },
-    body: JSON.stringify({
-      model,
-      messages: messages.map(m => ({ role: m.role, content: m.content })),
-      temperature: 0.7,
-      max_tokens: 1000
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`Groq API failed: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
 
 // Code generation

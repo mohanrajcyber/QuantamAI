@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+backend/node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# Environment files (will be copied separately)
+.env.local
+.env.production
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# External libraries
+ollamafreeapi-main/
+sphere-main/
+zan/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Test files
+**/*test*.js
+**/*test*.ts
+
+# API keys file
+API keys.txt

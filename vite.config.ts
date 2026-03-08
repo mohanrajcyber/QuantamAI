@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default defineConfig({
-  base: '/QuantamAI/',  // GitHub Pages base path
+  base: process.env.NODE_ENV === 'production' && process.env.GITHUB_PAGES ? '/QuantamAI/' : '/',
   plugins: [
     react({
       jsxRuntime: 'automatic'

@@ -1,0 +1,44 @@
+# Render.com Deployment Configuration
+# 100% FREE hosting for Quantum AI
+
+services:
+  # Backend API Service
+  - type: web
+    name: quantum-ai-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: HUGGINGFACE_API_KEY
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+    healthCheckPath: /api/health
+    
+  # Frontend Static Site
+  - type: web
+    name: quantum-ai-frontend
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: npm install --legacy-peer-deps && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_ENV
+        value: production

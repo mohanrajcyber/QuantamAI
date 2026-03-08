@@ -1,0 +1,62 @@
+# Quantum AI - Docker Compose Configuration
+# Includes auto-cleanup after 30 minutes of inactivity
+
+version: '3.8'
+
+services:
+  quantum-ai:
+    build: .
+    container_name: quantum-ai
+    ports:
+      - "3000:3000"  # Frontend
+      - "3001:3001"  # Backend API
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    env_file:
+      - backend/.env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.quantum-ai.auto-cleanup=true"
+      - "com.quantum-ai.idle-timeout=1800"  # 30 minutes in seconds
+    networks:
+      - quantum-network
+
+  # Auto-cleanup service (stops container after 30 mins of no activity)
+  cleanup-monitor:
+    image: alpine:latest
+    container_name: quantum-ai-cleanup
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: >
+      sh -c "
+      apk add --no-cache docker-cli &&
+      while true; do
+        sleep 1800;
+        LAST_ACCESS=\$(docker logs quantum-ai --since 30m 2>&1 | wc -l);
+        if [ \$LAST_ACCESS -eq 0 ]; then
+          echo 'No activity in 30 minutes. Cleaning up...';
+          docker stop quantum-ai;
+          docker system prune -f --volumes;
+        fi;
+      done
+      "
+    restart: unless-stopped
+    depends_on:
+      - quantum-ai
+    networks:
+      - quantum-network
+
+networks:
+  quantum-network:
+    driver: bridge
+
+volumes:
+  quantum-data:
+    driver: local
