@@ -8,7 +8,7 @@ import { QuantumIDE } from './components/QuantumIDE';
 import { QuantumAgent } from './components/QuantumAgent';
 import { WelcomeToast } from './components/WelcomeToast';
 import { ToastContainer } from './components/Toast';
-import BackendTest from './components/BackendTest';
+// import BackendTest from './components/BackendTest'; // Temporarily disabled for deployment
 import { ImageGenerator } from './components/ImageGenerator';
 import { VoiceAssistant } from './components/VoiceAssistant';
 import { DocumentAnalyzer } from './components/DocumentAnalyzer';
@@ -113,7 +113,8 @@ export default function App() {
       case 'quantumAgent':
         return <QuantumAgent />;
       case 'backendTest':
-        return <BackendTest />;
+        return <div className="p-8 text-white">Backend Test temporarily disabled for deployment</div>;
+        // return <BackendTest />;
       case 'imageGenerator':
         return <ImageGenerator onBack={() => setCurrentView('home')} language={language} />;
       case 'voiceAssistant':
