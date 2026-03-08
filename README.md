@@ -459,17 +459,34 @@ A comprehensive AI platform that breaks language and technology barriers:
 ## 📸 Screenshots
 
 ### 🎨 Live Application
-![Quantum AI Live](https://quantumai.vercel.app)
-**Live Demo:** https://quantumai.vercel.app
+**🌐 Live Demo:** [https://quantumai.vercel.app](https://quantumai.vercel.app)
 
-### Key Screens
-- **Login Page**: Beautiful gradient logo with authentication
-- **Home Dashboard**: Multi-panel layout with action cards
-- **Chat Interface**: Professional markdown, file upload, voice input
-- **Settings Page**: 8 themes, custom wallpaper, typography control
-- **Master Control**: Admin dashboard with system commands
-- **Multi-Language**: Seamless switching between English/Tamil/Hindi
-- **Responsive**: Perfect on phone, tablet, laptop, desktop
+### Application Screenshots
+
+<div align="center">
+
+#### Login & Welcome Screen
+![Login Page](screenshots/P1.png)
+*Beautiful gradient interface with multi-language support*
+
+#### Chat Interface
+![Chat Interface](screenshots/P2.png)
+*Professional AI chat with markdown, file upload, and voice input*
+
+#### Features & Settings
+![Features Dashboard](screenshots/P3.png)
+*8 themes, custom wallpaper, and advanced customization*
+
+</div>
+
+### Key Features Shown
+- ✅ **Multi-Language UI**: English, Tamil, Hindi support
+- ✅ **Responsive Design**: Works on all devices (phone to desktop)
+- ✅ **8 Color Themes**: Quantum, Cyberpunk, Matrix, Sunset, Ocean, Forest, Midnight, Rose
+- ✅ **AI Chat**: Multiple providers with smart fallback
+- ✅ **Voice I/O**: Speech-to-text and text-to-speech
+- ✅ **File Upload**: Images, PDFs, documents analysis
+- ✅ **Professional UI**: Glass-morphism effects and smooth animations
 
 ---
 
