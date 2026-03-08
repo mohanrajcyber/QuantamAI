@@ -90,6 +90,36 @@
 
 ---
 
+## � Project Structure
+
+```
+QuantumAI/
+├── src/                    # Frontend source code
+│   ├── app/               # React components
+│   │   ├── components/    # UI components
+│   │   ├── contexts/      # React contexts
+│   │   ├── services/      # API services
+│   │   └── utils/         # Utility functions
+│   └── styles/            # CSS styles
+├── backend/               # Backend server
+│   ├── ai/               # AI provider integrations
+│   ├── routes/           # API routes
+│   └── services/         # Backend services
+├── scripts/              # Setup & start scripts
+│   ├── INSTALL.bat       # Install dependencies
+│   ├── START-ALL-IN-ONE.bat  # Start everything
+│   └── ...               # Other utility scripts
+├── docs/                 # Documentation
+│   ├── guides/           # Setup guides
+│   └── references/       # Reference materials
+├── public/               # Static assets
+├── index.html            # Entry HTML
+├── package.json          # Frontend dependencies
+└── README.md             # This file
+```
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -140,9 +170,9 @@ YOUTUBE_API_KEY=your_youtube_key
 
 #### Option 1: One-Click Start (Windows)
 ```bash
-# Double-click START.bat
+# Double-click scripts/START-ALL-IN-ONE.bat
 # Or run:
-START.bat
+scripts\START-ALL-IN-ONE.bat
 ```
 
 #### Option 2: Manual Start
