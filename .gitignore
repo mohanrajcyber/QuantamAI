@@ -48,3 +48,8 @@ coverage/
 
 # Misc
 .npmrc
+
+# External libraries/projects (not part of Quantum AI)
+ollamafreeapi-main/
+sphere-main/
+zan/
