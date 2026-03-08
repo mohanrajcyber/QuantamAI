@@ -84,7 +84,7 @@ async function callOllama(messages: Message[], model?: string): Promise<string> 
   }
 }
 
-// NEW: Multi-Provider AI Call (uses new architecture with automatic fallback)
+// NEW: Multi-Provider AI Call using FREE APIs directly (no backend needed!)
 async function callMultiProviderAI(messages: Message[], conversationId?: string): Promise<string> {
   try {
     // Add system context with current date/time and creator information
@@ -116,66 +116,75 @@ Current date and time: ${currentDate.toLocaleString('en-US', {
       ? messages 
       : [systemContext, ...messages];
 
-    const response = await fetch('http://localhost:3001/api/chat', {
+    // Use FREE Hugging Face Inference API (no API key needed!)
+    const prompt = messagesWithContext
+      .map(m => {
+        if (m.role === 'system') return m.content;
+        if (m.role === 'user') return `User: ${m.content}`;
+        return `Assistant: ${m.content}`;
+      })
+      .join('\n\n');
+
+    const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-large', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        messages: messagesWithContext.map(m => ({ role: m.role, content: m.content })),
-        conversationId: conversationId || `conv_${Date.now()}`,
-        useCache: true
+        inputs: prompt,
+        parameters: {
+          max_length: 500,
+          temperature: 0.7,
+          top_p: 0.9,
+        }
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API error: ${response.statusText}`);
+      throw new Error(`API error: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log(`✅ Response from provider: ${data.provider} (${data.responseTime}ms)`);
-    return data.choices[0].message.content;
+    const aiResponse = data[0]?.generated_text || data.generated_text || 'I apologize, but I could not generate a response.';
+    
+    // Extract only the new response (remove the prompt)
+    const newResponse = aiResponse.replace(prompt, '').trim();
+    console.log(`✅ Response from FREE Hugging Face API`);
+    return newResponse || aiResponse;
   } catch (error) {
     console.error('Multi-Provider AI Error:', error);
     throw error;
   }
 }
 
-// Mock AI Call (fallback - always works for testing)
+// Mock AI Call (fallback - always works, no backend needed!)
 async function callMockAI(messages: Message[], conversationId?: string): Promise<string> {
-  try {
-    // Convert messages to a single prompt
-    const prompt = messages
-      .map(m => {
-        if (m.role === 'system') return `System: ${m.content}`;
-        if (m.role === 'user') return `User: ${m.content}`;
-        return `Assistant: ${m.content}`;
-      })
-      .join('\n\n');
-
-    const response = await fetch('http://localhost:3001/api/mock-ai/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        prompt,
-        provider: 'mock',
-        conversationId: conversationId || `conv_${Date.now()}`
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Mock AI error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-  } catch (error) {
-    console.error('Mock AI Error:', error);
-    throw error;
+  // Simple rule-based responses for demo
+  const lastMessage = messages[messages.length - 1]?.content.toLowerCase() || '';
+  
+  const responses = [
+    "I'm Quantum AI, created by Mohanraj! I'm here to help you with anything you need.",
+    "That's an interesting question! As Quantum AI, I can assist you with various tasks.",
+    "I understand. Let me help you with that. I'm powered by advanced AI technology.",
+    "Great question! I'm designed to provide helpful, accurate responses.",
+    "I'm here to assist you. Feel free to ask me anything!"
+  ];
+  
+  // Check for specific keywords
+  if (lastMessage.includes('who created') || lastMessage.includes('who made') || lastMessage.includes('who built')) {
+    return "I was created and developed by Mohanraj, a Cybersecurity Researcher, AI Developer, and the architect of the Quantum AI platform.";
   }
+  
+  if (lastMessage.includes('hello') || lastMessage.includes('hi ') || lastMessage.includes('hey')) {
+    return "Hello! I'm Quantum AI, created by Mohanraj. How can I help you today?";
+  }
+  
+  if (lastMessage.includes('help')) {
+    return "I'm here to help! I can assist with coding, answer questions, provide information, and much more. What would you like to know?";
+  }
+  
+  // Random response
+  return responses[Math.floor(Math.random() * responses.length)];
 }
 
 // Hugging Face API Call (through backend)
