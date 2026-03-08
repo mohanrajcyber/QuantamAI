@@ -3,8 +3,8 @@
 > **AI for Bharat Hackathon 2026 Submission**  
 > Created by **Mohanraj** - Cybersecurity Researcher & AI Developer
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live-success)](https://quantumai.vercel.app)
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://quantumai.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-success)](https://quantam-ai.vercel.app/)
+[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://quantam-ai.vercel.app/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript)](https://www.typescriptlang.org/)
@@ -24,7 +24,7 @@
 
 ## 🎥 Live Demo
 
-**🌐 Try it now:** [https://quantumai.vercel.app](https://quantumai.vercel.app)
+**🌐 Try it now:** [https://quantumai.vercel.app](https://quantam-ai.vercel.app/)
 
 **Demo Credentials:**
 - Click "Skip Login" for instant access
