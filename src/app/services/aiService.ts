@@ -1,5 +1,6 @@
 // AI Service - Serverless Function Integration (No CORS issues!)
 // Uses Vercel serverless functions to proxy API calls
+// Updated: March 8, 2026
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
