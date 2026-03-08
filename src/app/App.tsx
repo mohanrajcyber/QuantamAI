@@ -22,7 +22,7 @@ import AuthPage from './components/AuthPage';
 import { Bell, User, Globe } from 'lucide-react';
 import { Language, translations, languageNames, languageFlags } from './utils/translations';
 
-export type ViewType = 'home' | 'chat' | 'codeAssistant' | 'quantumIDE' | 'quantumAgent' | 'backendTest' | 'imageGenerator' | 'voiceAssistant' | 'documentAnalyzer' | 'dataAnalytics' | 'modelPlayground' | 'aiWorkflows' | 'hologram' | 'settings' | 'helpSupport' | 'masterControl';
+export type ViewType = 'home' | 'chat' | 'codeAssistant' | 'quantumIDE' | 'quantumAgent' | 'imageGenerator' | 'voiceAssistant' | 'documentAnalyzer' | 'dataAnalytics' | 'modelPlayground' | 'aiWorkflows' | 'hologram' | 'settings' | 'helpSupport' | 'masterControl';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('home');
@@ -112,9 +112,6 @@ export default function App() {
         return <QuantumIDE />;
       case 'quantumAgent':
         return <QuantumAgent />;
-      case 'backendTest':
-        return <div className="p-8 text-white">Backend Test temporarily disabled for deployment</div>;
-        // return <BackendTest />;
       case 'imageGenerator':
         return <ImageGenerator onBack={() => setCurrentView('home')} language={language} />;
       case 'voiceAssistant':
@@ -162,7 +159,6 @@ export default function App() {
                     case 'codeAssistant': return 'Code Assistant';
                     case 'quantumIDE': return 'Quantum IDE';
                     case 'quantumAgent': return 'Quantum Agent';
-                    case 'backendTest': return 'Backend Test';
                     case 'imageGenerator': return 'Image Generator';
                     case 'voiceAssistant': return 'Voice Assistant';
                     case 'documentAnalyzer': return 'Document Analyzer';
