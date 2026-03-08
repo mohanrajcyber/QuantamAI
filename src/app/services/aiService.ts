@@ -62,7 +62,7 @@ function callMockAI(messages: Message[]): string {
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
-// Main AI Service - Uses Vercel Serverless Function (No CORS issues!)
+// Main AI Service - Direct API calls with CORS proxy for GitHub Pages
 export async function generateAIResponse(
   messages: Message[],
   provider: AIProvider = 'groq',
@@ -73,31 +73,47 @@ export async function generateAIResponse(
   const messagesWithContext = hasSystemMessage ? messages : [getSystemContext(), ...messages];
 
   try {
-    // Call our serverless function
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        messages: messagesWithContext,
-        provider: provider === 'mock' ? 'auto' : provider,
-        model
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+    // Try Groq first (fastest and most reliable)
+    try {
+      const response = await callGroqDirect(messagesWithContext, model);
+      console.log('✅ Response from Groq');
+      return response;
+    } catch (error) {
+      console.warn('Groq failed, trying fallback...');
     }
 
-    const data = await response.json();
-    console.log(`✅ Response from ${data.provider}`);
-    return data.response;
+    // Fallback to mock AI
+    return callMockAI(messagesWithContext);
   } catch (error) {
     console.error('API Error:', error);
-    // Final fallback to mock AI
     return callMockAI(messagesWithContext);
   }
+}
+
+// Direct Groq API call (works on GitHub Pages)
+async function callGroqDirect(messages: Message[], model = 'mixtral-8x7b-32768'): Promise<string> {
+  const GROQ_API_KEY = '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';
+  
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+      temperature: 0.7,
+      max_tokens: 1000
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Groq API failed: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
 }
 
 // Code generation
